@@ -8,9 +8,11 @@ from tokenizers.processors import TemplateProcessing
 
 from datasets import load_dataset
 
-ds = load_dataset('OmniAICreator/Japanese-Wikipedia-202506')
+ds = load_dataset('OmniAICreator/Japanese-Wikipedia-202506', split='train', streaming=True)
+ds = ds.remove_columns(['id', 'title', 'raw_text'])
+
 def train_dataset():
-    for s in ds['train']['text']:
+    for s in ds['text']:
         yield s
 
 # === 入力 ===
@@ -18,7 +20,7 @@ def train_dataset():
 # save_dir = Path("artifacts"); save_dir.mkdir(parents=True, exist_ok=True)
 
 # === モデル本体 ===
-tokenizer: Tokenizer = Tokenizer(BPE(unk_token="<|unk|>"))
+tokenizer: Tokenizer = Tokenizer(BPE(unk_token="<unk>"))
 tokenizer.pre_tokenizer = ByteLevel(add_prefix_space=True)
 tokenizer.decoder = ByteLevelDecoder()
 
